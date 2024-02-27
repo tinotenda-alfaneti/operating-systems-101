@@ -50,6 +50,7 @@ void addProcessPagesToMemory(Process *process, int *memory) {
             for (int j = 0; j < MEMORY_SIZE; j++) {
                 if (memory[j] == -1) {
                     emptyFrame = j;
+                    // i have to call the method to print tnat i have accessed the memory here
                     break;
                 }
             }
