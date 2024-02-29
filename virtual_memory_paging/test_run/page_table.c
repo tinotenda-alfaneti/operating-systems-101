@@ -36,6 +36,8 @@ OuterPageTable* initializePageTable(int pid) {
             pageEntry->pageNumber = j; // Page numbers 0 to 15
             pageEntry->frameNumber = -1; // Initialize frame number to -1
             pageEntry->valid = 0; // Assuming initially all entries are invalid
+            pageEntry->offset = -1;
+            pageEntry->outerIndex = -1;
         }
     }
 

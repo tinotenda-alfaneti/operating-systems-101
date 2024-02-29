@@ -28,8 +28,8 @@ void printProcessTable(Process *process)
 		getIndices(process->requestedPages[i], indicesArr);
 
 		PageEntry *entry = &(process->table->innerPageTables[(int)indicesArr[0]].entries[(int)indicesArr[1]]);
-		printf("Page Number: %d||Frame Number: %d||PID: %d||Valid: %d\n",
-			entry->pageNumber, entry->frameNumber, entry->pid, entry->valid);
+		printf("Page Number: %d||Frame Number: %d||Outer Table Index: %d||Offset: %d||PID: %d||Valid: %d\n",
+			entry->pageNumber, entry->frameNumber, entry->outerIndex, entry->offset, entry->pid, entry->valid);
 		
 	}
 }
@@ -41,7 +41,13 @@ void addProcessPagesToMemory(Process *process, int *memory) {
         uint32_t indicesArr[3];
         getIndices(process->requestedPages[i], indicesArr);
 
-        PageEntry *entry = &(process->table->innerPageTables[(int)indicesArr[0]].entries[(int)indicesArr[1]]);
+		int outerIdx = (int)indicesArr[0];
+		int pageNum = (int)indicesArr[1];
+		int offset = (int)indicesArr[2];
+
+        PageEntry *entry = &(process->table->innerPageTables[outerIdx].entries[pageNum]);
+		entry->outerIndex = outerIdx;
+		entry->offset = offset;
 
         insertFrame(entry, memory);
         
@@ -49,7 +55,7 @@ void addProcessPagesToMemory(Process *process, int *memory) {
 
 }
 
-void printMemory(Frame *memory) {
+void printMemory_(Frame *memory) {
     printf("\nMemory:\n");
     for (int i = 0; i < MEMORY_SIZE; i++) {
         if (memory[i].valid == 0) {
@@ -57,6 +63,23 @@ void printMemory(Frame *memory) {
         } else {
             printf("%2d: Page %d\n", i, (int)memory[i].pageNumber);
         }
+    }
+}
+
+void printMemory(Frame *memory) {
+    printf("\n\t\tMEMORY\n");
+    printf("+-------+---------+--------+--------+\n");
+    printf("| Frame | Process |  Page  |  Outer |\n");
+    printf("|  Num  |   ID    |  Num   |  Index |\n");
+    printf("+-------+---------+--------+--------+\n");
+    
+    for (int i = 0; i < MEMORY_SIZE; i++) {
+        if (memory[i].valid == 0) {
+            printf("|%7d|   Empty |        |        |\n", i);
+        } else {
+            printf("|%7d|%9d|%8d|%8d|\n", i, memory[i].pid, memory[i].pageNumber, memory[i].outerIndex);
+        }
+        printf("+-------+---------+--------+--------+\n");
     }
 }
 

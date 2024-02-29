@@ -26,7 +26,7 @@ void insertFrame(PageEntry *entry, Frame *memory) {
             j = i;
         }
         // add the outer page index and then the pid
-        if (memory[i].pageNumber == entry->pageNumber) {
+        if (memory[i].pageNumber == entry->pageNumber && memory[i].outerIndex == entry->outerIndex && memory[i].pid == entry->pid) {
             entry->frameNumber = i;
             accessMemory(entry->frameNumber, 0, memory);
             return;
@@ -38,6 +38,8 @@ void insertFrame(PageEntry *entry, Frame *memory) {
         memory[j].pageNumber = entry->pageNumber;
         memory[j].pid = entry->pid;
         memory[j].valid = 1;
+        memory[j].offset = entry->offset;
+        memory[j].outerIndex = entry->outerIndex;
         entry->frameNumber = j;
         printf("Frame successfully allocated into memory for PID: %d\n", memory[j].pid);
     }
@@ -59,6 +61,8 @@ Frame *createFrame(int numFrames) {
         frames[i].pageNumber = -1;
         frames[i].frameNumber = i;
         frames[i].valid = 0;
+        frames[i].outerIndex = -1;
+        frames[i].offset = -1;
     }
     printf("%d frames created in memory. Memory size: %d\n", numFrames, MEMORY_SIZE);
     return frames;

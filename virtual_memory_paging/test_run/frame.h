@@ -11,6 +11,8 @@ typedef struct {
     int pageNumber;   
     int frameNumber;
     int valid;
+    int offset;
+    int outerIndex;
 } Frame;
 
 void insertFrame(PageEntry *entry, Frame *memory);
