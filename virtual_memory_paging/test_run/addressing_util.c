@@ -15,9 +15,14 @@ void getIndices(uint32_t address, uint32_t *indicesArr) {
 }
 
 // Function to generate a random 32-bit hexadecimal address
-unsigned int generateRandomAddress() {
+unsigned int generateRandomAddress(int i) {
+    
     // Seed the random number generator
-    srand(time(NULL));
+    struct timespec current_time;
+    clock_gettime(CLOCK_REALTIME, &current_time);
+    long long current_time_nsec = current_time.tv_sec * 1000000000LL + current_time.tv_nsec;
+    
+    srand(current_time_nsec);
 
     // Generate a random hexadecimal address
     unsigned int address = 0;
@@ -33,8 +38,8 @@ uint32_t* getRandomPages(int numPages) {
     uint32_t* requestedPages = (uint32_t*)malloc(numPages*sizeof(uint32_t));
 
     for (int i = 0; i < numPages; i++) {
-        requestedPages[i] = generateRandomAddress();
-        sleep(1);
+        requestedPages[i] = generateRandomAddress(i);
+        // sleep(1);
     }
     return requestedPages;
 }

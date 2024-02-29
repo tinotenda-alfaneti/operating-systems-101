@@ -47,7 +47,6 @@ void addProcessPagesToMemory(Process *process, int *memory) {
         
     }
 
-
 }
 
 void printMemory(Frame *memory) {
