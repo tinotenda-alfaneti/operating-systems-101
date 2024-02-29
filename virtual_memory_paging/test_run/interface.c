@@ -98,11 +98,6 @@ void manualSystem(){
     printProcesses();
     moreResources();
 
-    // if(requestMoreMemory() == -1){
-    //     printf("Error occurred. Please try again.\n");
-    //     requestMoreMemory();
-    // }
-
     simulateProcessesRun(allProcesses, num_processes);
 
 }

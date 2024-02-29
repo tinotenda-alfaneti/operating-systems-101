@@ -1,5 +1,11 @@
 #include "frame.h"
 
+// global variable
+int pageFaults = 0;
+int hits = 0;
+int totalAccesses = 0;
+
+
 int accessMemory(int frameNumber, int offset, Frame *memory) {
     if (frameNumber < 0 || frameNumber >= MEMORY_SIZE) {
         printf("Invalid frame number\n");
@@ -11,15 +17,15 @@ int accessMemory(int frameNumber, int offset, Frame *memory) {
         return -1;
     }
 
-    // Accessing data from memory
-    int accessedData = memory[frameNumber].pid; // Example: accessing PID stored in the frame
+    int accessedData = memory[frameNumber].pid; 
     printf("Data at frame %d, offset %d: %d\n", frameNumber, offset, accessedData);
     printf("Frame ID: %d\n", memory[frameNumber].frameNumber);
+    hits++;
     return frameNumber;
 }
 
-
 void insertFrame(PageEntry *entry, Frame *memory) {
+    
     int i, j = -1;
     for (i = 0; i < MEMORY_SIZE; i++) {
         if (memory[i].valid == 0) {
@@ -40,11 +46,22 @@ void insertFrame(PageEntry *entry, Frame *memory) {
         memory[j].valid = 1;
         entry->frameNumber = j;
         printf("Frame successfully allocated into memory for PID: %d\n", memory[j].pid);
+        
     }
     else {
+        pageFaults ++;
         printf("Memory is full, cannot insert page %d for PID: %d\n",entry->pageNumber, entry->pid);
+       
     }
-    
+    totalAccesses++; 
+}
+
+// Function to calculate hit rate
+float printStatistics() {
+    printf("Total Page Accessed :| %d\n", totalAccesses);
+    printf("Total Page hits     :| %d\n", hits);
+    printf("Total Page faults   :| %d\n", pageFaults);
+    printf("Hit Rate            :| %f\n", ((float)hits / totalAccesses) * 100);
 }
 
 // Function to create a new frame
