@@ -1,9 +1,9 @@
 #include "process.h"
 #include "addressing.h"
+#include "frame.h"
 
 #define OUTER_TABLE_SIZE 16
 #define INNER_TABLE_SIZE 16
-#define MEMORY_SIZE 8 // Number of frames in memory
 
 Process *createProcess(int pID, int numPages)
 {
@@ -36,7 +36,6 @@ void printProcessTable(Process *process)
 
 void addProcessPagesToMemory(Process *process, int *memory) {
     int i;
-    int writtenPages = 0;
 
     for (i = 0; i < process->numPages; i++) {
         uint32_t indicesArr[3];
@@ -44,54 +43,27 @@ void addProcessPagesToMemory(Process *process, int *memory) {
 
         PageEntry *entry = &(process->table->innerPageTables[(int)indicesArr[0]].entries[(int)indicesArr[1]]);
 
-        if (entry->frameNumber == -1) {
-            // Find an empty frame in memory
-            int emptyFrame = -1;
-            for (int j = 0; j < MEMORY_SIZE; j++) {
-                if (memory[j] == -1) {
-                    emptyFrame = j;
-                    break;
-                }
-            }
-
-            if (emptyFrame != -1) {
-                // Update page entry with frame number
-                entry->frameNumber = emptyFrame;
-				entry->pageNumber = (int) indicesArr[1];
-                entry->valid = 1; // Mark as valid
-				entry->pid = process->pID;
-                // Update memory with page number
-                memory[emptyFrame] = entry->pageNumber;
-                writtenPages++;
-            } else {
-                printf("Memory is full\n");
-            }
-        } else {
-            printf("Collision: Page %d of process %d is already in memory\n", entry->pageNumber, process->pID);
+        insertFrame(entry, memory);
         
-        }
     }
 
-    if (writtenPages == process->numPages)
-        printf("Page added successfully\n");
-    else
-        printf("Error allocating memory\n");
+
 }
 
-void printMemory(int *memory) {
+void printMemory(Frame *memory) {
     printf("\nMemory:\n");
     for (int i = 0; i < MEMORY_SIZE; i++) {
-        if (memory[i] == -1) {
+        if (memory[i].valid == 0) {
             printf("%2d: Empty\n", i);
         } else {
-            printf("%2d: Page %d\n", i, (int)memory[i]);
+            printf("%2d: Page %d\n", i, (int)memory[i].pageNumber);
         }
     }
 }
 
 int main() {
 
-    int numPages = 5;
+    int numPages = 9;
 
     Process *proc = createProcess(12, numPages);
 	printf("Process ID: %d\n", proc->pID);
@@ -102,27 +74,24 @@ int main() {
     uint32_t indicesArr[3]; // Array to store level indices and offset
     
 	//initialize memory
-	int memory[MEMORY_SIZE];
-    for (int i = 0; i < MEMORY_SIZE; i++) {
-        memory[i] = -1; // Initialize memory with -1 (empty)
-    }
+	Frame *memory = createFrame(8);
 
 
-	//print the different pages to be requested by the process
-    for (int i = 0; i < numPages; i++) {
-	    address = proc->requestedPages[i];
+	// //print the different pages to be requested by the process
+    // for (int i = 0; i < numPages; i++) {
+	//     address = proc->requestedPages[i];
 
-	    // Extract level indices and offset from the address
-    	getIndices(address, indicesArr);
+	//     // Extract level indices and offset from the address
+    // 	getIndices(address, indicesArr);
 
-        // Print the random address in hexadecimal format
-        printf("\n\nRandom Address: 0x%04X\n", address);
-	    // Print the results
-    	printf("OUTER_TABLE index: (hex) 0x%01X (dec) %lu\n", indicesArr[0], (unsigned long)indicesArr[0]);
-    	printf("PAGE NUMBER: (hex) 0x%01X (dec) %lu\n", indicesArr[1], (unsigned long)indicesArr[1]);
-    	printf("Offset: (hex) 0x%02X (dec) %lu\n\n", indicesArr[2], (unsigned long)indicesArr[2]);
-	sleep(1);
-    }
+    //     // Print the random address in hexadecimal format
+    //     printf("\n\nRandom Address: 0x%04X\n", address);
+	//     // Print the results
+    // 	printf("OUTER_TABLE index: (hex) 0x%01X (dec) %lu\n", indicesArr[0], (unsigned long)indicesArr[0]);
+    // 	printf("PAGE NUMBER: (hex) 0x%01X (dec) %lu\n", indicesArr[1], (unsigned long)indicesArr[1]);
+    // 	printf("Offset: (hex) 0x%02X (dec) %lu\n\n", indicesArr[2], (unsigned long)indicesArr[2]);
+	// sleep(1);
+    // }
 
 	//adding process pages to memory test
 	addProcessPagesToMemory(proc, memory);

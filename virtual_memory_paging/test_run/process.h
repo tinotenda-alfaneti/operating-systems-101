@@ -1,3 +1,6 @@
+#ifndef __process_h_
+#define __process_h_
+
 #include "page_table.h"
 
 typedef struct _Process { 
@@ -7,3 +10,5 @@ typedef struct _Process {
   OuterPageTable *table; 
   int numPages;
 }Process;
+
+#endif
