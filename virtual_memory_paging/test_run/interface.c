@@ -46,23 +46,30 @@ void enterNumPages() {
     }
 }
 
-int requestMoreMemory() {
+void automatedPages(int numPages) {
+    allProcesses = (Process *)malloc(num_processes * sizeof(Process));
+    for (int i = 0; i < num_processes; i++) {
+        allProcesses[i] =  *createProcess(processesIDs[i], numPages);
+    }
+}
+
+void moreResources(){
     int more_resources;
     printf("Enter the number of the process that will request for more resources: ");
     scanf("%d", &more_resources);
+    requestMoreMemory(more_resources);
+}
 
+void requestMoreMemory(int more_resources) {
     if (more_resources <= 0 || more_resources > num_processes) {
-       
         printf("Invalid process number.                            |\n");
         printf("Please enter a number between 1 and %d.            |\n", num_processes);
-    
         return -1;
     }
         
         printf("| Process %d will request for more resources  |\n", processesIDs[more_resources - 1]);
        
 }
-
 
 void printProcesses() {
     printf("\nProcesses:\n");
@@ -71,9 +78,8 @@ void printProcesses() {
     }
 }
 
-
-int main() {
-    header();
+// manual GUI
+void manualSystem(){
 
     int NUM_PROCESSES;
 
@@ -90,13 +96,73 @@ int main() {
     createProcesses();
     enterNumPages();
     printProcesses();
+    moreResources();
 
-    if(requestMoreMemory() == -1){
-        printf("Error occurred. Please try again.\n");
-        requestMoreMemory();
-    }
+    // if(requestMoreMemory() == -1){
+    //     printf("Error occurred. Please try again.\n");
+    //     requestMoreMemory();
+    // }
 
     simulateProcessesRun(allProcesses, num_processes);
+
+}
+
+// automated GUI
+
+void automatedSystem(){
+    int NUM_PROCESSES = 5; 
+    int NUM_PAGES = 2;   
+    int more_resources = 3; 
+
+    num_processes = NUM_PROCESSES;
+
+    // Allocate memory for processes IDs
+    createProcesses();
+
+    // Allocate memory for allProcesses
+    allProcesses = (Process *)malloc(num_processes * sizeof(Process));
+    if (allProcesses == NULL) {
+        printf("Memory allocation failed.\n");
+        free(processesIDs);
+        exit(1);
+    }
+
+    automatedPages(NUM_PAGES);
+    requestMoreMemory(more_resources);
+
+    printProcesses();
+
+    simulateProcessesRun(allProcesses, num_processes);
+
+    // Free allocated memory
+    free(allProcesses);
+}
+
+
+
+void seletSystem(int value) {
+    switch(value) {
+        case 1:
+            manualSystem();
+            break;
+        case 2:
+            automatedSystem();
+            break;
+        default:
+            printf("Invalid option\n");
+            break;
+    }
+    return;
+}
+
+int main() {
+    header();
+    
+    int SYSTEMTYPE;
+    
+    printf("Do you want the system to be \n 1). Manual\n 2). Automated \n");
+    scanf("%d", &SYSTEMTYPE);
+    seletSystem(SYSTEMTYPE);
 
     printBorder();
     printf("*------------EXECUTION FINISHED EXITING------------*\n");
