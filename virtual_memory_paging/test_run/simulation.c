@@ -70,6 +70,8 @@ void simulateProcessesRun( Process processes[], int NUMBER_OF_PROCESSES){
     
 
     printMemory(memory);
+    
+    printStatistics();
  
     }
 
