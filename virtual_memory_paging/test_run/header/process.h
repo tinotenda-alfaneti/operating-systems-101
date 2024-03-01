@@ -7,7 +7,6 @@
 
 typedef struct { 
   int pID;
-  int prob; // for requesting another page
   uint32_t  *requestedPages;
   OuterPageTable *table; 
   int numPages;

@@ -1,45 +1,12 @@
 #include "header/simulation.h"
 #include "header/addressing.h"
 #include "header/colors.h"
+#include "header/print.h"
 
 #define MORE_MEM (rand() % (PAGE_SIZE * 3))
 
-void printRequestQueue(Process process) {
-    printf("\n\t\tREQUEST QUEUE\n");
-    printf(YELLOW);
-    printf("+-----------------+-----------+\n");
-    printf("| REQUEST ADDRESS |PROCESS ID |\n");
-    printf("+-----------------+-----------+\n");
-    printf(RESET);
-
-    for(int r = 0; r < process.numPages; r++) {
-        printf("|   0x%03X        |     %3d    |\n", process.requestedPages[r], process.pID);
-    }
-
-    printf("+-----------------+-----------+\n");
-}
-
-void printMemory(Frame *memory) {
-    printf("\n\t\tMEMORY\n");
-    printf(YELLOW);
-    printf("+-------+---------+--------+--------+\n");
-    printf("| Frame | Process |  Page  |  Outer |\n");
-    printf("|  Num  |   ID    |  Num   |  Index |\n");
-    printf("+-------+---------+--------+--------+\n");
-    printf(RESET);
-    
-    for (int i = 0; i < NUM_FRAMES; i++) {
-        if (memory[i].valid == 0) {
-            printf("|%7d|   %sEmpty%s                   |\n", i, RED, RESET);
-        } else {
-            printf("|%7d|%9d|%8d|%8d|\n", i, memory[i].pid, memory[i].pageNumber, memory[i].outerIndex);
-        }
-        printf("+-------+---------+--------+--------+\n");
-    }
-}
-
 int requestMoreMemory(Process *process, int additionalMemory, Frame *memory) {
-    printf("\nProcess %d is requesting %s%d%s...", process->pID, BLUE, additionalMemory, RESET);
+    printf("\nProcess %d is requesting %s%d%s units...", process->pID, BLUE, additionalMemory, RESET);
 
     int additionalPages = additionalMemory / PAGE_SIZE;
     if ((additionalMemory % PAGE_SIZE) != 0) additionalPages += 1;
@@ -99,12 +66,10 @@ void addProcessPagesToMemory(Process *process, Frame *memory, int needMemory) {
 
 }
 
-
 void simulateProcessesRun(Process *processes, int NUMBER_OF_PROCESSES, int reqProcess){
 
     //initialize memory
 	Frame *memory = createFrame();
-    printMemory(memory);
 
     for(int i = 0; i < NUMBER_OF_PROCESSES; i++){
         printf("\n\n%sCURRENT PROCCESS RUNNING: PID=%d %s\n", BLUE, processes[i].pID, RESET);

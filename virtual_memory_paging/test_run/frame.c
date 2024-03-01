@@ -21,7 +21,7 @@ int accessMemory(PageEntry *entry, Frame *memory) {
     // Accessing data from memory
     int accessedData = memory[entry->frameNumber].pid; // Example: accessing PID stored in the frame
     printf("\nMEMORY ACCESS REQUEST\n");
-    printf("\nData at frame %d, offset %d: %d\n", frameNumber, entry->offset, accessedData);
+    printf("\nData at frame %d, from page: %d, offset %d, PID: %d\n", frameNumber, entry->pageNumber, entry->offset, accessedData);
     printf("Frame ID: %d\n", memory[frameNumber].frameNumber);
     hits++;
     totalAccesses++;
@@ -55,7 +55,7 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *process) {
         memory[j].outerIndex = entry->outerIndex;
         entry->frameNumber = j;
         printf(GREEN);
-        printf("Page successfully allocated into memory in frame: %d\n", memory[j].frameNumber);
+        printf("Page %d successfully allocated into memory in frame: %d\n", entry->pageNumber, memory[j].frameNumber);
         hits++;
         printf(RESET);
         

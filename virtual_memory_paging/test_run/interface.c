@@ -3,6 +3,8 @@
 #include "header/simulation.h"
 #include "header/colors.h"
 
+#define VIRTUAL_MEM 256
+
 int *processesIDs = NULL;
 int *memoryReq = NULL;
 Process *allProcesses = NULL;
@@ -42,7 +44,7 @@ void freeProcesses() {
     free(processesIDs);
 }
 
-void enterNumPages() {
+int enterNumPages() {
     allProcesses = (Process *)malloc(num_processes * sizeof(Process));
     memoryReq = (int *)malloc(num_processes * sizeof(int));
     for (int i = 0; i < num_processes; i++) {
@@ -50,12 +52,21 @@ void enterNumPages() {
         int memory = 0;
         printf("Enter memory required for process %d (ID: %d): ", i + 1, processesIDs[i]);
         scanf("%d", &memory);
+
+        if (memory > VIRTUAL_MEM) {
+            printf(RED);
+            printf("|         Invalid memory requested.                |\n");
+            printf(RESET);
+
+            return -1;
+        }
         numPages = memory / PAGE_SIZE;
         if ((memory % PAGE_SIZE) != 0) numPages += 1;
         memoryReq[i] = memory;
 
         allProcesses[i] =  *createProcess(processesIDs[i], numPages);
     }
+    return 1;
 }
 
 void automatedPages(int *numPages) {
@@ -74,8 +85,8 @@ void moreResources(){
 int moreMemoryRequest(int more_resources) {
     if (more_resources <= 0 || more_resources > num_processes) {
         printf(RED);
-        printf("Invalid process number.                            |\n");
-        printf("Please enter a number between 1 and %d.            |\n", num_processes);
+        printf("|         Invalid process number.                  |\n");
+        printf("|   Please enter a number between 1 and %d.        |\n", num_processes);
         printf(RESET);
         return -1;
     }
@@ -104,7 +115,10 @@ void manualSystem(){
 
  
     createProcesses();
-    enterNumPages();
+    int res = enterNumPages();
+    if (res == -1) {
+        return;
+    }
     printProcesses();
     if (num_processes != 1) {
          moreResources();

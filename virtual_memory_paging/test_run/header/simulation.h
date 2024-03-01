@@ -9,7 +9,6 @@
 #include "frame.h"
 
 void simulateProcessesRun( Process processes[], int NUMBER_OF_PROCESSES, int reqProcess);
-void printMemory(Frame *memory);
 void addProcessPagesToMemory(Process *process, Frame *memory, int needMemory);
 int countFreeFrames(Frame *memory);
 int requestMoreMemory(Process *process, int additionalMemory, Frame *memory);

@@ -1,23 +1,18 @@
 #include "header/addressing.h"
 
-// Define the bit masks for extracting level indices and offset
-uint32_t outerMask = 0xF00;  
-uint32_t innerMask = 0x0F0;  
-uint32_t offsetMask = 0x00F;  // mask for offset
-
 // Function to extract level indices and offset from a 32-bit hexadecimal address
 void getIndices(uint32_t address, uint32_t *indicesArr) {
     
     // Extract level indices and offset using bit masking
-    indicesArr[0] = (address & outerMask) >> OUTER_TABLE; // Level 0 index
-    indicesArr[1] = (address & innerMask) >> INNER_TABLE; // Level 1 index
-    indicesArr[2] = address & offsetMask;         // Offset
+    indicesArr[0] = (address & 0xF00) >> OUTER_TABLE; // Extract Level 0 index by masking and shifting
+    indicesArr[1] = (address & 0x0F0) >> INNER_TABLE; // Extract Level 1 index by masking and shifting
+    indicesArr[2] = address & 0x00F;         // Extract Offset by masking
 }
 
 // Function to generate a random 32-bit hexadecimal address
 unsigned int generateRandomAddress() {
     
-    // Seed the random number generator
+    // Seed the random number generator with current time in nanoseconds
     struct timespec current_time;
     clock_gettime(CLOCK_REALTIME, &current_time);
     long long current_time_nsec = current_time.tv_sec * 1000000000LL + current_time.tv_nsec;
@@ -27,11 +22,11 @@ unsigned int generateRandomAddress() {
     // Generate a random hexadecimal address
     unsigned int address = 0;
     for (int i = 0; i < 3; ++i) {
-        address <<= 4; // Shift left by 4 bits
+        address <<= 4; // Shift left by 4 bits for each iteration
         if (i == 2) {
-            address |= rand() % 16;   
+            address |= rand() % 16;   // For the last nibble, use random value between 0 and 15
         } else {
-            address |= rand() % 4; // Generate a random nibble (3-bit hexadecimal digit)
+            address |= rand() % 4; // Generate a random value between 0 and 3 for the index
         }
         
     }
@@ -39,6 +34,7 @@ unsigned int generateRandomAddress() {
     return address;
 }
 
+// Function to generate an array of random 32-bit hexadecimal addresses
 uint32_t* getRandomPages(int numPages) {
     uint32_t* requestedPages = (uint32_t*)malloc(numPages*sizeof(uint32_t));
 
