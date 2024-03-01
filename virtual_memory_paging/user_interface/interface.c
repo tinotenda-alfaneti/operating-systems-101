@@ -1,6 +1,9 @@
 #include "interface.h"
+#include "process.h"
+#include "simulation.h"
 
-Process *processes = NULL;
+int *processesIDs = NULL;
+Process *allProcesses = NULL;
 int num_processes = 0;
 int more_resources = 0;
 
@@ -18,24 +21,28 @@ void header(){
 }
 
 void createProcesses() {
-    processes = (Process*)malloc(MAX_PROCESSES * sizeof(Process));
-    if (processes == NULL) {
+    processesIDs = (int*)malloc(MAX_PROCESSES * sizeof(int));
+    if (processesIDs == NULL) {
         printf("Memory allocation failed.\n");
         exit(1);
     }
     for (int i = 0; i < num_processes; i++) {
-        processes[i].id = 100 + i;
+        processesIDs[i] = 100 + i;
     }
 }
 
 void freeProcesses() {
-    free(processes);
+    free(processesIDs);
 }
 
 void enterNumPages() {
+    allProcesses = (Process *)malloc(num_processes * sizeof(Process));
     for (int i = 0; i < num_processes; i++) {
-        printf("Enter number of pages for process %d (ID: %d): ", i + 1, processes[i].id);
-        scanf("%d", &processes[i].num_pages);
+        int numPages = 0;
+        printf("Enter number of pages for process %d (ID: %d): ", i + 1, processesIDs[i]);
+        scanf("%d", &numPages);
+
+        allProcesses[i] =  *createProcess(processesIDs[i], numPages);
     }
 }
 
@@ -52,7 +59,7 @@ int requestMoreMemory() {
         return -1;
     }
         
-        printf("| Process %d will request for more resources  |\n", processes[more_resources - 1].id);
+        printf("| Process %d will request for more resources  |\n", processesIDs[more_resources - 1]);
        
 }
 
@@ -60,7 +67,7 @@ int requestMoreMemory() {
 void printProcesses() {
     printf("\nProcesses:\n");
     for (int i = 0; i < num_processes; i++) {
-        printf("Process %d (ID: %d) - Pages: %d\n", i + 1, processes[i].id, processes[i].num_pages);
+        printf("Process %d (ID: %d) - Pages: %d\n", i + 1, processesIDs[i], allProcesses[i].numPages);
     }
 }
 
@@ -88,6 +95,8 @@ int main() {
         printf("Error occurred. Please try again.\n");
         requestMoreMemory();
     }
+
+    simulateProcessesRun(allProcesses, num_processes);
 
     printBorder();
     printf("*------------EXECUTION FINISHED EXITING------------*\n");

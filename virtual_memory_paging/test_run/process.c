@@ -1,5 +1,6 @@
 #include "process.h"
 #include "addressing.h"
+#include "simulation.h"
 #include "frame.h"
 
 #define OUTER_TABLE_SIZE 16
@@ -16,48 +17,56 @@ Process *createProcess(int pID, int numPages)
 	return p;
 }
 
-void printProcessTable(Process *process)
-{
-	printf("\nProcess pID: %d\n", process->pID);
-	printf("Current Pages: %d\n", process->numPages);
+void printProcessTable(Process *process) {
+    printf("+-------------+-------------+-------------+-------------+-----+-------+\n");
+    printf("| Page Number | Frame Num   | Outer Index | Offset      | PID | Valid |\n");
+    printf("+-------------+-------------+-------------+-------------+-----+-------+\n");
 
-	uint32_t indicesArr[3];
+    uint32_t indicesArr[3];
 
-	for (int i = 0; i < process->numPages; ++i) {
-
-		getIndices(process->requestedPages[i], indicesArr);
-
-		PageEntry *entry = &(process->table->innerPageTables[(int)indicesArr[0]].entries[(int)indicesArr[1]]);
-		printf("Page Number: %d||Frame Number: %d||PID: %d||Valid: %d\n",
-			entry->pageNumber, entry->frameNumber, entry->pid, entry->valid);
-		
-	}
-}
-
-void addProcessPagesToMemory(Process *process, int *memory) {
-    int i;
-
-    for (i = 0; i < process->numPages; i++) {
-        uint32_t indicesArr[3];
+    for (int i = 0; i < process->numPages; ++i) {
         getIndices(process->requestedPages[i], indicesArr);
 
         PageEntry *entry = &(process->table->innerPageTables[(int)indicesArr[0]].entries[(int)indicesArr[1]]);
-
-        insertFrame(entry, memory);
-        
+        printf("| %11d | %11d | %11d | %11d | %3d | %5d |\n",
+               entry->pageNumber, entry->frameNumber, entry->outerIndex, entry->offset, entry->pid, entry->valid);
     }
 
+    printf("+-------------+-------------+-------------+-------------+-----+-------+\n");
+}
+
+void addProcessPagesToMemory(Request *request, int *memory, Process *processes) {
+
+	uint32_t indicesArr[3];
+	getIndices(request->address, indicesArr);
+
+	int outerIdx = (int)indicesArr[0];
+	int pageNum = (int)indicesArr[1];
+	int offset = (int)indicesArr[2];
+
+	PageEntry *entry = &(processes[request->process_id % 100].table->innerPageTables[outerIdx].entries[pageNum]);
+	entry->outerIndex = outerIdx;
+	entry->offset = offset;
+
+	insertFrame(entry, memory, processes);
+        
 
 }
 
 void printMemory(Frame *memory) {
-    printf("\nMemory:\n");
+    printf("\n\t\tMEMORY\n");
+    printf("+-------+---------+--------+--------+\n");
+    printf("| Frame | Process |  Page  |  Outer |\n");
+    printf("|  Num  |   ID    |  Num   |  Index |\n");
+    printf("+-------+---------+--------+--------+\n");
+    
     for (int i = 0; i < MEMORY_SIZE; i++) {
         if (memory[i].valid == 0) {
-            printf("%2d: Empty\n", i);
+            printf("|%7d|   Empty |        |        |\n", i);
         } else {
-            printf("%2d: Page %d\n", i, (int)memory[i].pageNumber);
+            printf("|%7d|%9d|%8d|%8d|\n", i, memory[i].pid, memory[i].pageNumber, memory[i].outerIndex);
         }
+        printf("+-------+---------+--------+--------+\n");
     }
 }
 

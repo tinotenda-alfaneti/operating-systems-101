@@ -13,6 +13,19 @@ void shuffle(Request *items, int num_items)
     }
 }
 
+void printRequestQueue(Request *list_of_requests, int total_requests) {
+    printf("\nRequest Queue:\n");
+    printf("+-----------------+------------+\n");
+    printf("| REQUEST ADDRESS | PROCESS ID |\n");
+    printf("+-----------------+------------+\n");
+
+    for(int r = 0; r < total_requests; r++) {
+        printf("|   0x%04X        |     %3d    |\n", list_of_requests[r].address, list_of_requests[r].process_id);
+    }
+
+    printf("+-----------------+------------+\n");
+}
+
 void simulateProcessesRun( Process processes[], int NUMBER_OF_PROCESSES){
     //list to be shuffled instead of a linked list
     int sum = 0;
@@ -22,7 +35,6 @@ void simulateProcessesRun( Process processes[], int NUMBER_OF_PROCESSES){
         sum += processes[i].numPages;
     }
     int total_requests = sum;
-    printf("the total number of processes is %d \n", sum);
 
     Request *list_of_requests = (Request*)malloc(sum * sizeof(Request));
 
@@ -43,17 +55,16 @@ void simulateProcessesRun( Process processes[], int NUMBER_OF_PROCESSES){
     }
 
     shuffle(list_of_requests, total_requests);
-    printf("\nAfter Shuffle\n");
-    for(int r = 0; r < total_requests; r++){
-        printf("REQUEST ADDRESS: (hex) 0x%04X PROCESS_ID %d\n", list_of_requests[r].address, list_of_requests[r].process_id);
-    }
+    printRequestQueue(list_of_requests, total_requests);
 
     //initialize memory
 	Frame *memory = createFrame(8);
+    printMemory(memory);
 
     for(int i = 0; i < total_requests; i++){
         int index = list_of_requests[i].process_id % 100;
-        addProcessPagesToMemory(&processes[index], memory);
+        printf("\n\nREQUEST %d to address 0x%04X from %d\n", i + 1, list_of_requests[i].address, list_of_requests[i].process_id);
+        addProcessPagesToMemory(&list_of_requests[i], memory, processes);
         printProcessTable(&processes[index]);   
     }
     

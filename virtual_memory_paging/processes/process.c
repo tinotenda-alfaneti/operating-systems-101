@@ -61,48 +61,50 @@ void printMemory(Frame *memory) {
     }
 }
 
-int main() {
+//TEST
 
-    int numPages = 9;
+// int main() {
 
-    Process *proc = createProcess(12, numPages);
-	printf("Process ID: %d\n", proc->pID);
+//     int numPages = 9;
 
-    // Generate a random address
-    unsigned int address;
+//     Process *proc = createProcess(12, numPages);
+// 	printf("Process ID: %d\n", proc->pID);
 
-    uint32_t indicesArr[3]; // Array to store level indices and offset
+//     // Generate a random address
+//     unsigned int address;
+
+//     uint32_t indicesArr[3]; // Array to store level indices and offset
     
-	//initialize memory
-	Frame *memory = createFrame(8);
+// 	//initialize memory
+// 	Frame *memory = createFrame(8);
 
 
-	// //print the different pages to be requested by the process
-    // for (int i = 0; i < numPages; i++) {
-	//     address = proc->requestedPages[i];
+// 	// //print the different pages to be requested by the process
+//     // for (int i = 0; i < numPages; i++) {
+// 	//     address = proc->requestedPages[i];
 
-	//     // Extract level indices and offset from the address
-    // 	getIndices(address, indicesArr);
+// 	//     // Extract level indices and offset from the address
+//     // 	getIndices(address, indicesArr);
 
-    //     // Print the random address in hexadecimal format
-    //     printf("\n\nRandom Address: 0x%04X\n", address);
-	//     // Print the results
-    // 	printf("OUTER_TABLE index: (hex) 0x%01X (dec) %lu\n", indicesArr[0], (unsigned long)indicesArr[0]);
-    // 	printf("PAGE NUMBER: (hex) 0x%01X (dec) %lu\n", indicesArr[1], (unsigned long)indicesArr[1]);
-    // 	printf("Offset: (hex) 0x%02X (dec) %lu\n\n", indicesArr[2], (unsigned long)indicesArr[2]);
-	// sleep(1);
-    // }
+//     //     // Print the random address in hexadecimal format
+//     //     printf("\n\nRandom Address: 0x%04X\n", address);
+// 	//     // Print the results
+//     // 	printf("OUTER_TABLE index: (hex) 0x%01X (dec) %lu\n", indicesArr[0], (unsigned long)indicesArr[0]);
+//     // 	printf("PAGE NUMBER: (hex) 0x%01X (dec) %lu\n", indicesArr[1], (unsigned long)indicesArr[1]);
+//     // 	printf("Offset: (hex) 0x%02X (dec) %lu\n\n", indicesArr[2], (unsigned long)indicesArr[2]);
+// 	// sleep(1);
+//     // }
 
-	//adding process pages to memory test
-	addProcessPagesToMemory(proc, memory);
+// 	//adding process pages to memory test
+// 	addProcessPagesToMemory(proc, memory);
 
-	// Print process table
-    printProcessTable(proc);
+// 	// Print process table
+//     printProcessTable(proc);
 
-    // Print memory
-    printMemory(memory);
+//     // Print memory
+//     printMemory(memory);
 
-	printProcessTable(proc);
-    return 0;
+// 	printProcessTable(proc);
+//     return 0;
 
-}
+// }

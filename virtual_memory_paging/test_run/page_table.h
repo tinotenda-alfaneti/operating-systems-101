@@ -9,7 +9,9 @@ typedef struct {
     int pid;
     int pageNumber;   
     int frameNumber;
-    int valid;
+    int valid;\
+    int offset;
+    int outerIndex;
 } PageEntry;
 
 typedef struct {

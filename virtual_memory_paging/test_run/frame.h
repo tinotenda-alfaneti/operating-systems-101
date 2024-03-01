@@ -1,3 +1,6 @@
+#ifndef _FRAME_H
+#define _FRAME_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h> 
@@ -11,10 +14,14 @@ typedef struct {
     int pageNumber;   
     int frameNumber;
     int valid;
+    int offset;
+    int outerIndex;
 } Frame;
 
-void insertFrame(PageEntry *entry, Frame *memory);
+void insertFrame(PageEntry *entry, Frame *memory, Process *processes);
 // Frame memory[MEMORY_SIZE]; // Array to simulate memory
-int accessMemory(int frameNumber, int offset, Frame *memory);
+int accessMemory(PageEntry *entry, Frame *memory);
 Frame *createFrame(int numFrames);
 void releaseFrame(Frame *frame);
+
+#endif
