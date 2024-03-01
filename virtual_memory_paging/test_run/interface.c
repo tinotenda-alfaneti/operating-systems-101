@@ -120,7 +120,7 @@ void manualSystem(){
 void automatedSystem(){
     int NUM_PROCESSES = 5; 
     int NUM_PAGES[5] = {1,2,3,4,5};   
-    int more_resources = 0; 
+    int more_resources = 1; 
 
     num_processes = NUM_PROCESSES;
 
@@ -139,7 +139,7 @@ void automatedSystem(){
 
     moreMemoryRequest(more_resources);
 
-    printProcesses();
+    // printProcesses();
 
     simulateProcessesRun(allProcesses, num_processes, more_resources);
 

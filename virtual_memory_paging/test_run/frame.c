@@ -109,7 +109,6 @@ int countFreeFrames(Frame *memory) {
     for (int i = NUM_FRAMES - 1; i >= 0; i--) {
         if (memory[i].valid == 0) {
             sum++;
-
         }
      }
      return sum;
