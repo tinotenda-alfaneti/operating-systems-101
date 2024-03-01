@@ -19,9 +19,10 @@ typedef struct {
 } Frame;
 
 void insertFrame(PageEntry *entry, Frame *memory, Process *processes);
-// Frame memory[MEMORY_SIZE]; // Array to simulate memory
 int accessMemory(PageEntry *entry, Frame *memory);
 Frame *createFrame(int numFrames);
 void releaseFrame(Frame *frame);
+void removeFromFrame(Frame remove, Process *processes);
+void printStatistics();
 
 #endif

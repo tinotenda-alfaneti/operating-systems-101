@@ -13,7 +13,9 @@ typedef struct {
     int process_id;  
 } Request;
 
-void simulateProcessesRun( Process processes[], int NUMBER_OF_PROCESSES);
+void simulateProcessesRun( Process processes[], int NUMBER_OF_PROCESSES, int reqProcess);
 void shuffle(Request *items, int num_items);
+void printMemory(Frame *memory);
+void addProcessPagesToMemory(Request *request, Frame *memory, Process *processes);
 
 #endif /* SIMULATION_H */

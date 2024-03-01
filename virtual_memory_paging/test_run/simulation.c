@@ -1,4 +1,6 @@
-#include "simulation.h"
+#include "header/simulation.h"
+#include "header/addressing.h"
+#include "header/colors.h"
 
 void shuffle(Request *items, int num_items)
 {
@@ -26,10 +28,46 @@ void printRequestQueue(Request *list_of_requests, int total_requests) {
     printf("+-----------------+------------+\n");
 }
 
-void simulateProcessesRun( Process processes[], int NUMBER_OF_PROCESSES){
-    //list to be shuffled instead of a linked list
-    int sum = 0;
+void printMemory(Frame *memory) {
+    printf("\n\t\tMEMORY\n");
+    printf(YELLOW);
+    printf("+-------+---------+--------+--------+\n");
+    printf("| Frame | Process |  Page  |  Outer |\n");
+    printf("|  Num  |   ID    |  Num   |  Index |\n");
+    printf("+-------+---------+--------+--------+\n");
+    printf(RESET);
+    
+    for (int i = 0; i < MEMORY_SIZE; i++) {
+        if (memory[i].valid == 0) {
+            printf("|%7d|   %sEmpty%s                   |\n", i, RED, RESET);
+        } else {
+            printf("|%7d|%9d|%8d|%8d|\n", i, memory[i].pid, memory[i].pageNumber, memory[i].outerIndex);
+        }
+        printf("+-------+---------+--------+--------+\n");
+    }
+}
+void addProcessPagesToMemory(Request *request, Frame *memory, Process *processes) {
 
+	uint32_t indicesArr[3];
+	getIndices(request->address, indicesArr);
+
+	int outerIdx = (int)indicesArr[0];
+	int pageNum = (int)indicesArr[1];
+	int offset = (int)indicesArr[2];
+
+	PageEntry *entry = &(processes[request->process_id % 100].table->innerPageTables[outerIdx].entries[pageNum]);
+	entry->outerIndex = outerIdx;
+	entry->offset = offset;
+
+	insertFrame(entry, memory, processes);
+        
+
+}
+
+
+void simulateProcessesRun(Process processes[], int NUMBER_OF_PROCESSES, int reqProcess){
+    
+    int sum = 0;
 
     for (int i = 0; i < NUMBER_OF_PROCESSES; i++) {
         sum += processes[i].numPages;
@@ -63,41 +101,16 @@ void simulateProcessesRun( Process processes[], int NUMBER_OF_PROCESSES){
 
     for(int i = 0; i < total_requests; i++){
         int index = list_of_requests[i].process_id % 100;
-        printf("\n\nREQUEST %d to address 0x%04X from %d\n", i + 1, list_of_requests[i].address, list_of_requests[i].process_id);
+        printf("\n\n%sREQUEST %d to address 0x%04X from %d%s\n", BLUE, i + 1, list_of_requests[i].address, list_of_requests[i].process_id, RESET);
         addProcessPagesToMemory(&list_of_requests[i], memory, processes);
         printProcessTable(&processes[index]);   
     }
     
+    requestMoreMemory(&processes[reqProcess], 3);
+    
 
     printMemory(memory);
-    
+
     printStatistics();
  
     }
-
-    //TEST 
-// int main() {
-
-//     int numPages = 2;
-
-//     Process *proc1= createProcess(100, numPages);
-//     Process *proc2 = createProcess(101, numPages);
-//     Process *proc3 = createProcess(102, numPages);
-//     // Process *proc4 = createProcess(16, numPages);
-// 	printf("-----------------------FOUND PROCESS ID HERE -------------------");
-
-//     Process processes[3];
-//     processes[0] = *proc1;
-//     processes[1] = *proc2;
-//     processes[2] = *proc3;
-//     // processes[3] = *proc4;
-    
-
-//     //simulation
-//     simulateProcessesRun(processes, 3);
-
-//     return 0;
-
-
-// }
-

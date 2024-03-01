@@ -1,3 +1,6 @@
+#ifndef PAGE_TABLE_H
+#define PAGE_TABLE_H
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,3 +26,5 @@ typedef struct {
 } OuterPageTable;
 
 OuterPageTable* initializePageTable(int pid);
+
+#endif

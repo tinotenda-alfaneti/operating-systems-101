@@ -1,4 +1,5 @@
-#include "frame.h"
+#include "header/frame.h"
+#include "header/colors.h"
 
 // global variable
 int pageFaults = 0;
@@ -37,6 +38,7 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
         // add the outer page index and then the pid
         if (memory[i].pageNumber == entry->pageNumber && memory[i].outerIndex == entry->outerIndex && memory[i].pid == entry->pid) {
             entry->frameNumber = i;
+            entry->valid = 1;
             accessMemory(entry, memory);
             return;
         }
@@ -50,8 +52,11 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
         memory[j].offset = entry->offset;
         memory[j].outerIndex = entry->outerIndex;
         entry->frameNumber = j;
+        printf(GREEN);
         printf("Frame successfully allocated into memory for PID: %d\n", memory[j].pid);
         hits++;
+        printf(RESET);
+        
     }
     else {
         j = rand() % MEMORY_SIZE;
@@ -65,13 +70,15 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
         entry->frameNumber = j;
         pageFaults ++;
         removeFromFrame(removedFrame, processes);
+        printf(RED);
         printf("Memory is full, removed page %d added: %d\n",removedFrame.pageNumber, entry->pageNumber);
         // totalAccesses++;
+        printf(RESET);
     }
     totalAccesses++; 
 }
 
-void printStatistics(int totalAccesses, int hits, int pageFaults) {
+void printStatistics() {
     // Calculate hit rate
     float hitRate = ((float)hits / totalAccesses) * 100;
 
@@ -118,14 +125,3 @@ Frame *createFrame(int numFrames) {
 void releaseFrame(Frame *frame) {
     free(frame);
 }
-
-//TEST
-// int main() {
-//     // Test code
-//     Frame *frames = createFrame(10); // Creating 10 frames
-//     Frame frame1 = {1, 0, 0, 1}; // Sample frame
-//     insertFrame(frame1);
-//     accessMemory(0, 0); 
-//     releaseFrame(frames); // Releasing frames
-//     return 0;
-// }

@@ -7,5 +7,9 @@
 #define MAX_PROCESSES 10 // Maximum number of processes
 #define MAX_PAGES 100    // Maximum number of pages per process
 
+int moreMemoryRequest(int more_resources);
+void manualSystem();
+void automatedSystem();
+
 #endif
 
