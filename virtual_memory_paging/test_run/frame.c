@@ -1,4 +1,5 @@
 #include "header/frame.h"
+#include "header/colors.h"
 
 // global variable
 int pageFaults = 0;
@@ -50,7 +51,9 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
         memory[j].offset = entry->offset;
         memory[j].outerIndex = entry->outerIndex;
         entry->frameNumber = j;
+        printf(GREEN);
         printf("Frame successfully allocated into memory for PID: %d\n", memory[j].pid);
+        printf(RESET);
         
     }
     else {
@@ -64,7 +67,9 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
         memory[j].outerIndex = entry->outerIndex;
         entry->frameNumber = j;
         removeFromFrame(removedFrame, processes);
+        printf(RED);
         printf("Memory is full, removed page %d added: %d\n",removedFrame.pageNumber, entry->pageNumber);
+        printf(RESET);
         pageFaults ++;
     }
     totalAccesses++; 

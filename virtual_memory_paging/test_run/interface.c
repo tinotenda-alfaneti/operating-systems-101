@@ -1,6 +1,7 @@
 #include "header/interface.h"
 #include "header/process.h"
 #include "header/simulation.h"
+#include "header/colors.h"
 
 int *processesIDs = NULL;
 Process *allProcesses = NULL;
@@ -13,11 +14,13 @@ void printBorder() {
 }
 
 void header(){
+    printf(YELLOW);
     printBorder();
-    printf("|*|------------------------WELCOME-------------------------|*|\n");
-    printf("|*|--------------------------TO----------------------------|*|\n");
-    printf("*----------------SIMULATION MEMORY MANEGMENT-----------------*\n");
+    printf("*----------------------------WELCOME------------------------*\n");
+    printf("*------------------------------TO---------------------------*\n");
+    printf("*-------------------MEMORY MANAGEMENT SIMULATION------------*\n");
     printBorder();
+    printf(RESET);
 }
 
 void createProcesses() {
@@ -62,8 +65,10 @@ void moreResources(){
 
 int moreMemoryRequest(int more_resources) {
     if (more_resources <= 0 || more_resources > num_processes) {
+        printf(RED);
         printf("Invalid process number.                            |\n");
         printf("Please enter a number between 1 and %d.            |\n", num_processes);
+        printf(RESET);
         return -1;
     }
         
@@ -83,12 +88,11 @@ void printProcesses() {
 void manualSystem(){
 
     int NUM_PROCESSES;
-
     printf("Enter number of processes you want to run: ");
     scanf("%d", &NUM_PROCESSES);
 
     if (NUM_PROCESSES > MAX_PROCESSES) {
-        printf("Exceeded maximum number of processes. Exiting...\n");
+        printf("%sExceeded maximum number of processes. Exiting...%s\n", RED, RESET);
         return;
     }
 
@@ -121,6 +125,7 @@ void automatedSystem(){
     // Allocate memory for allProcesses
     allProcesses = (Process *)malloc(num_processes * sizeof(Process));
     if (allProcesses == NULL) {
+        
         printf("Memory allocation failed.\n");
         free(processesIDs);
     }
@@ -171,9 +176,11 @@ int main(int argc, char *argv[]) {
 
     selectSystem(SYSTEMTYPE);
 
+    printf(YELLOW);
     printBorder();
     printf("*------------------EXECUTION FINISHED EXITING---------------*\n");
     printBorder();
+    printf(RESET);
 
     freeProcesses();
 

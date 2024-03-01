@@ -1,5 +1,6 @@
 #include "header/simulation.h"
 #include "header/addressing.h"
+#include "header/colors.h"
 
 void shuffle(Request *items, int num_items)
 {
@@ -29,14 +30,16 @@ void printRequestQueue(Request *list_of_requests, int total_requests) {
 
 void printMemory(Frame *memory) {
     printf("\n\t\tMEMORY\n");
+    printf(YELLOW);
     printf("+-------+---------+--------+--------+\n");
     printf("| Frame | Process |  Page  |  Outer |\n");
     printf("|  Num  |   ID    |  Num   |  Index |\n");
     printf("+-------+---------+--------+--------+\n");
+    printf(RESET);
     
     for (int i = 0; i < MEMORY_SIZE; i++) {
         if (memory[i].valid == 0) {
-            printf("|%7d|   Empty |        |        |\n", i);
+            printf("|%7d|   %sEmpty%s                   |\n", i, RED, RESET);
         } else {
             printf("|%7d|%9d|%8d|%8d|\n", i, memory[i].pid, memory[i].pageNumber, memory[i].outerIndex);
         }
@@ -98,7 +101,7 @@ void simulateProcessesRun(Process processes[], int NUMBER_OF_PROCESSES, int reqP
 
     for(int i = 0; i < total_requests; i++){
         int index = list_of_requests[i].process_id % 100;
-        printf("\n\nREQUEST %d to address 0x%04X from %d\n", i + 1, list_of_requests[i].address, list_of_requests[i].process_id);
+        printf("\n\n%sREQUEST %d to address 0x%04X from %d%s\n", BLUE, i + 1, list_of_requests[i].address, list_of_requests[i].process_id, RESET);
         addProcessPagesToMemory(&list_of_requests[i], memory, processes);
         printProcessTable(&processes[index]);   
     }
