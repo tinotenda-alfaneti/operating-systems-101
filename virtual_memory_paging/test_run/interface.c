@@ -14,9 +14,9 @@ void printBorder() {
 
 void header(){
     printBorder();
-    printf("|*|----------WELCOME----------|*|\n");
-    printf("|*|-------------TO------------|*|\n");
-    printf("*--SIMULATION MEMORY MANEGMENT--*\n");
+    printf("|*|------------------------WELCOME-------------------------|*|\n");
+    printf("|*|--------------------------TO----------------------------|*|\n");
+    printf("*----------------SIMULATION MEMORY MANEGMENT-----------------*\n");
     printBorder();
 }
 
@@ -96,7 +96,10 @@ void manualSystem(){
     createProcesses();
     enterNumPages();
     printProcesses();
-    moreResources();
+    if (num_processes != 1) {
+         moreResources();
+    }
+   
 
     simulateProcessesRun(allProcesses, num_processes);
 
