@@ -58,8 +58,8 @@ void printProcessTable(Process *process) {
         entry->outerIndex = outerIndex;
         entry->offset = offset;
         if (entry->frameNumber != -1) {
-            printf("| %11d | %11d | %11d | %11d | %3d | %5d |\n",
-               entry->pageNumber, entry->frameNumber, entry->outerIndex, entry->offset, entry->pid, entry->valid);
+            printf("| %11d | %s%11d%s | %11d | %11d | %3d | %5d |\n",
+               entry->pageNumber, GREEN, entry->frameNumber, RESET, entry->outerIndex, entry->offset, entry->pid, entry->valid);
         } else {
             printf("| %11d | %s%11d%s | %11d | %11d | %3d | %5d |\n",
                entry->pageNumber, RED, entry->frameNumber, RESET, entry->outerIndex, entry->offset, entry->pid, entry->valid);
