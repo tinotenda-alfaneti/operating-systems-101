@@ -1,4 +1,4 @@
-#include "frame.h"
+#include "header/frame.h"
 
 // global variable
 int pageFaults = 0;
@@ -36,6 +36,7 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
         // add the outer page index and then the pid
         if (memory[i].pageNumber == entry->pageNumber && memory[i].outerIndex == entry->outerIndex && memory[i].pid == entry->pid) {
             entry->frameNumber = i;
+            entry->valid = 1;
             accessMemory(entry, memory);
             return;
         }
@@ -70,7 +71,7 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
 }
 
 // Function to calculate hit rate
-float printStatistics() {
+void printStatistics() {
     printf("Total Page Accessed :| %d\n", totalAccesses);
     printf("Total Page hits     :| %d\n", hits);
     printf("Total Page faults   :| %d\n", pageFaults);
@@ -105,14 +106,3 @@ Frame *createFrame(int numFrames) {
 void releaseFrame(Frame *frame) {
     free(frame);
 }
-
-//TEST
-// int main() {
-//     // Test code
-//     Frame *frames = createFrame(10); // Creating 10 frames
-//     Frame frame1 = {1, 0, 0, 1}; // Sample frame
-//     insertFrame(frame1);
-//     accessMemory(0, 0); 
-//     releaseFrame(frames); // Releasing frames
-//     return 0;
-// }

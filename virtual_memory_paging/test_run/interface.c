@@ -1,6 +1,6 @@
-#include "interface.h"
-#include "process.h"
-#include "simulation.h"
+#include "header/interface.h"
+#include "header/process.h"
+#include "header/simulation.h"
 
 int *processesIDs = NULL;
 Process *allProcesses = NULL;
@@ -46,10 +46,10 @@ void enterNumPages() {
     }
 }
 
-void automatedPages(int numPages) {
+void automatedPages(int *numPages) {
     allProcesses = (Process *)malloc(num_processes * sizeof(Process));
     for (int i = 0; i < num_processes; i++) {
-        allProcesses[i] =  *createProcess(processesIDs[i], numPages);
+        allProcesses[i] =  *createProcess(processesIDs[i], numPages[i]);
     }
 }
 
@@ -57,10 +57,10 @@ void moreResources(){
     int more_resources;
     printf("Enter the number of the process that will request for more resources: ");
     scanf("%d", &more_resources);
-    requestMoreMemory(more_resources);
+    moreMemoryRequest(more_resources);
 }
 
-void requestMoreMemory(int more_resources) {
+int moreMemoryRequest(int more_resources) {
     if (more_resources <= 0 || more_resources > num_processes) {
         printf("Invalid process number.                            |\n");
         printf("Please enter a number between 1 and %d.            |\n", num_processes);
@@ -68,6 +68,7 @@ void requestMoreMemory(int more_resources) {
     }
         
         printf("| Process %d will request for more resources  |\n", processesIDs[more_resources - 1]);
+        return 1;
        
 }
 
@@ -88,7 +89,7 @@ void manualSystem(){
 
     if (NUM_PROCESSES > MAX_PROCESSES) {
         printf("Exceeded maximum number of processes. Exiting...\n");
-        return 1;
+        return;
     }
 
     num_processes = NUM_PROCESSES;
@@ -101,7 +102,7 @@ void manualSystem(){
     }
    
 
-    simulateProcessesRun(allProcesses, num_processes);
+    simulateProcessesRun(allProcesses, num_processes, more_resources);
 
 }
 
@@ -109,8 +110,8 @@ void manualSystem(){
 
 void automatedSystem(){
     int NUM_PROCESSES = 5; 
-    int NUM_PAGES = 2;   
-    int more_resources = 3; 
+    int NUM_PAGES[5] = {1,2,3,4,5};   
+    int more_resources = 1; 
 
     num_processes = NUM_PROCESSES;
 
@@ -122,15 +123,15 @@ void automatedSystem(){
     if (allProcesses == NULL) {
         printf("Memory allocation failed.\n");
         free(processesIDs);
-        exit(1);
     }
 
     automatedPages(NUM_PAGES);
-    requestMoreMemory(more_resources);
+
+    moreMemoryRequest(more_resources);
 
     printProcesses();
 
-    simulateProcessesRun(allProcesses, num_processes);
+    simulateProcessesRun(allProcesses, num_processes, more_resources);
 
     // Free allocated memory
     free(allProcesses);
@@ -138,7 +139,7 @@ void automatedSystem(){
 
 
 
-void seletSystem(int value) {
+void selectSystem(int value) {
     switch(value) {
         case 1:
             manualSystem();
@@ -153,17 +154,25 @@ void seletSystem(int value) {
     return;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     header();
     
     int SYSTEMTYPE;
     
-    printf("Do you want the system to be \n 1). Manual\n 2). Automated \n");
-    scanf("%d", &SYSTEMTYPE);
-    seletSystem(SYSTEMTYPE);
+    if (argc == 2) {
+        SYSTEMTYPE = atoi(argv[1]);
+    } else {
+
+        printf("Do you want the system to be \n 1). Manual\n 2). Automated \n");
+        scanf("%d", &SYSTEMTYPE);
+
+    }
+
+
+    selectSystem(SYSTEMTYPE);
 
     printBorder();
-    printf("*------------EXECUTION FINISHED EXITING------------*\n");
+    printf("*------------------EXECUTION FINISHED EXITING---------------*\n");
     printBorder();
 
     freeProcesses();

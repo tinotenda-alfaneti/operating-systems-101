@@ -1,4 +1,4 @@
-#include "page_table.h"
+#include "header/page_table.h"
 
 OuterPageTable* initializePageTable(int pid) {
     OuterPageTable *outerPageTable = (OuterPageTable*)malloc(sizeof(OuterPageTable));
@@ -56,36 +56,3 @@ void freePageTable(OuterPageTable *outerPageTable) {
     free(outerPageTable->innerPageTables);
     free(outerPageTable);
 }
-
-//TESTING
-
-// int main() {
-//     // Initialize page table for process with PID 100
-//     OuterPageTable *pageTable = initializePageTable(100);
-
-//     if (pageTable == NULL) {
-//         printf("Failed to initialize page table\n");
-//         return 1;
-//     }
-
-//     printf("Page table initialized successfully:\n");
-
-//     // Print the contents of the page table
-//     printf("Outer Page Table:\n");
-//     for (int i = 0; i < OUTER_TABLE_SIZE; ++i) {
-//         printf("Outer Table Index: %d\n", i);
-//         printf("Inner Page Table:\n");
-//         for (int j = 0; j < INNER_TABLE_SIZE; ++j) {
-//             PageEntry *entry = &(pageTable->innerPageTables[i].entries[j]);
-//             printf("Page Number: %d, Frame Number: %d, PID: %d, Valid: %d\n",
-//                    entry->pageNumber, entry->frameNumber, entry->pid, entry->valid);
-//         }
-//     }
-
-//     // Free memory allocated for page table
-//     freePageTable(pageTable);
-    
-//     return 0;
-// }
-
-
