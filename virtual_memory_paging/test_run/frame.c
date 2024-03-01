@@ -23,6 +23,7 @@ int accessMemory(PageEntry *entry, Frame *memory) {
     printf("\nData at frame %d, offset %d: %d\n", frameNumber, entry->offset, accessedData);
     printf("Frame ID: %d\n", memory[frameNumber].frameNumber);
     hits++;
+    totalAccesses++;
     return frameNumber;
 }
 
@@ -50,7 +51,7 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
         memory[j].outerIndex = entry->outerIndex;
         entry->frameNumber = j;
         printf("Frame successfully allocated into memory for PID: %d\n", memory[j].pid);
-        
+        hits++;
     }
     else {
         j = rand() % MEMORY_SIZE;
@@ -62,20 +63,31 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
         memory[j].offset = entry->offset;
         memory[j].outerIndex = entry->outerIndex;
         entry->frameNumber = j;
+        pageFaults ++;
         removeFromFrame(removedFrame, processes);
         printf("Memory is full, removed page %d added: %d\n",removedFrame.pageNumber, entry->pageNumber);
-        pageFaults ++;
+        // totalAccesses++;
     }
     totalAccesses++; 
 }
 
-// Function to calculate hit rate
-float printStatistics() {
-    printf("Total Page Accessed :| %d\n", totalAccesses);
-    printf("Total Page hits     :| %d\n", hits);
-    printf("Total Page faults   :| %d\n", pageFaults);
-    printf("Hit Rate            :| %f\n", ((float)hits / totalAccesses) * 100);
+void printStatistics(int totalAccesses, int hits, int pageFaults) {
+    // Calculate hit rate
+    float hitRate = ((float)hits / totalAccesses) * 100;
+
+    // Print table
+    printf("\n\t\tPAGE STATISTICS\n");
+    printf("+-----------------------+----------------+\n");
+    printf("|  %-20s |  %12d  |\n", "Total Page Accessed", totalAccesses);
+    printf("+-----------------------+----------------+\n");
+    printf("|  %-20s |  %12d  |\n", "Total Page hits", hits);
+    printf("+-----------------------+----------------+\n");
+    printf("|  %-20s |  %12d  |\n", "Total Page faults", pageFaults);
+    printf("+-----------------------+----------------+\n");
+    printf("|  %-20s |  %12.2f%% |\n", "Hit Rate", hitRate);
+    printf("+-----------------------+----------------+\n");
 }
+
 
 void removeFromFrame(Frame remove, Process *processes) {
 
@@ -89,6 +101,7 @@ Frame *createFrame(int numFrames) {
     Frame *frames = (Frame *)malloc(numFrames * sizeof(Frame));
     if (frames == NULL) {
         printf("Memory allocation failed\n");
+        pageFaults ++;
         exit(1);
     }
     for (int i = 0; i < numFrames; i++) {
