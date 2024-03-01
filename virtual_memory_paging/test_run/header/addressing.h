@@ -6,8 +6,8 @@
 #include <time.h>
 #include <stdint.h>
 
-#define OUTER_TABLE 12
-#define INNER_TABLE 8
+#define OUTER_TABLE 8
+#define INNER_TABLE 4
 
 unsigned int generateRandomAddress();
 uint32_t* getRandomPages(int numPages);

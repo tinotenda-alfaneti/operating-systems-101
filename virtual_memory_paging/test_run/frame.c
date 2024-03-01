@@ -8,7 +8,7 @@ int totalAccesses = 0;
 
 int accessMemory(PageEntry *entry, Frame *memory) {
     int frameNumber = entry->frameNumber;
-    if (frameNumber < 0 || frameNumber >= MEMORY_SIZE) {
+    if (frameNumber < 0 || frameNumber >= NUM_FRAMES) {
         printf("Invalid frame number\n");
         return -1;
     }
@@ -28,16 +28,18 @@ int accessMemory(PageEntry *entry, Frame *memory) {
 }
 
 
-void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
+void insertFrame(PageEntry *entry, Frame *memory, Process *process) {
     int i, j = -1;
-    for (i = 0; i < MEMORY_SIZE; i++) {
+    for (i = NUM_FRAMES - 1; i >= 0; i--) {
         if (memory[i].valid == 0) {
             j = i;
+
         }
         // add the outer page index and then the pid
         if (memory[i].pageNumber == entry->pageNumber && memory[i].outerIndex == entry->outerIndex && memory[i].pid == entry->pid) {
             entry->frameNumber = i;
             entry->valid = 1;
+            memory[i].offset[entry->offset] = entry->offset;
             accessMemory(entry, memory);
             return;
         }
@@ -48,7 +50,7 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
         memory[j].pageNumber = entry->pageNumber;
         memory[j].pid = entry->pid;
         memory[j].valid = 1;
-        memory[j].offset = entry->offset;
+        memory[j].offset[entry->offset] = entry->offset;
         memory[j].outerIndex = entry->outerIndex;
         entry->frameNumber = j;
         printf(GREEN);
@@ -57,16 +59,16 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *processes) {
         
     }
     else {
-        j = rand() % MEMORY_SIZE;
+        j = rand() % NUM_FRAMES;
         Frame removedFrame = memory[j];
         memory[j].frameNumber = j;
         memory[j].pageNumber = entry->pageNumber;
         memory[j].pid = entry->pid;
         memory[j].valid = 1;
-        memory[j].offset = entry->offset;
+        memory[j].offset[entry->offset] = entry->offset;
         memory[j].outerIndex = entry->outerIndex;
         entry->frameNumber = j;
-        removeFromFrame(removedFrame, processes);
+        removeFromFrame(removedFrame, process);
         printf(RED);
         printf("Memory is full, removed page %d added: %d\n",removedFrame.pageNumber, entry->pageNumber);
         printf(RESET);
@@ -83,27 +85,38 @@ void printStatistics() {
     printf("Hit Rate            :| %f\n", ((float)hits / totalAccesses) * 100);
 }
 
-void removeFromFrame(Frame remove, Process *processes) {
+void removeFromFrame(Frame remove, Process *process) {
 
-    PageEntry *entry = &(processes[remove.pid % 100].table->innerPageTables[remove.outerIndex].entries[remove.pageNumber]);
+    PageEntry *entry = &(process->table->innerPageTables[remove.outerIndex].entries[remove.pageNumber]);
     entry->frameNumber = -1;
 
 }
 
+int countFreeFrames(Frame *memory) {
+    int sum = 0;
+    for (int i = NUM_FRAMES - 1; i >= 0; i--) {
+        if (memory[i].valid == 0) {
+            sum++;
+
+        }
+     }
+     return sum;
+}
+
 // Function to create a new frame
-Frame *createFrame(int numFrames) {
-    Frame *frames = (Frame *)malloc(numFrames * sizeof(Frame));
+Frame *createFrame() {
+    Frame *frames = (Frame *)malloc(NUM_FRAMES * sizeof(Frame));
     if (frames == NULL) {
         printf("Memory allocation failed\n");
         exit(1);
     }
-    for (int i = 0; i < numFrames; i++) {
+    for (int i = 0; i < NUM_FRAMES; i++) {
         frames[i].pid = -1;
         frames[i].pageNumber = -1;
         frames[i].frameNumber = i;
         frames[i].valid = 0;
         frames[i].outerIndex = -1;
-        frames[i].offset = -1;
+        frames[i].offset = (int *)malloc(PAGE_SIZE * sizeof(int));
     }
     return frames;
 }

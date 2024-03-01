@@ -3,7 +3,7 @@
 
 #include "page_table.h"
 
-#define MAX_REQUESTS 30
+#define MAX_REQUESTS 128
 
 typedef struct { 
   int pID;
@@ -15,6 +15,5 @@ typedef struct {
 
 Process *createProcess(int pID, int numPages);
 void printProcessTable(Process *process);
-int requestMoreMemory(Process *process, int additionalPages);
 
 #endif

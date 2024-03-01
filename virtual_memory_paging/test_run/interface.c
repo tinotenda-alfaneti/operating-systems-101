@@ -4,6 +4,7 @@
 #include "header/colors.h"
 
 int *processesIDs = NULL;
+int *memoryReq = NULL;
 Process *allProcesses = NULL;
 int num_processes = 0;
 int more_resources = 0;
@@ -19,6 +20,9 @@ void header(){
     printf("*----------------------------WELCOME------------------------*\n");
     printf("*------------------------------TO---------------------------*\n");
     printf("*-------------------MEMORY MANAGEMENT SIMULATION------------*\n");
+    printf("+-------------+-------------+-------------+-----------------+\n");
+    printf("| VIRTUAL MEM: 256  |  PHYSICAL MEM: 128  |  PAGE SIZE: 16  |\n");
+    printf("+-------------+-------------+-------------+-----------------+\n");
     printBorder();
     printf(RESET);
 }
@@ -40,10 +44,15 @@ void freeProcesses() {
 
 void enterNumPages() {
     allProcesses = (Process *)malloc(num_processes * sizeof(Process));
+    memoryReq = (int *)malloc(num_processes * sizeof(int));
     for (int i = 0; i < num_processes; i++) {
         int numPages = 0;
-        printf("Enter number of pages for process %d (ID: %d): ", i + 1, processesIDs[i]);
-        scanf("%d", &numPages);
+        int memory = 0;
+        printf("Enter memory required for process %d (ID: %d): ", i + 1, processesIDs[i]);
+        scanf("%d", &memory);
+        numPages = memory / PAGE_SIZE;
+        if ((memory % PAGE_SIZE) != 0) numPages += 1;
+        memoryReq[i] = memory;
 
         allProcesses[i] =  *createProcess(processesIDs[i], numPages);
     }
@@ -58,7 +67,7 @@ void automatedPages(int *numPages) {
 
 void moreResources(){
     int more_resources;
-    printf("Enter the number of the process that will request for more resources: ");
+    printf("Which process is likely to request for more resources: ");
     scanf("%d", &more_resources);
     moreMemoryRequest(more_resources);
 }
@@ -71,32 +80,29 @@ int moreMemoryRequest(int more_resources) {
         printf(RESET);
         return -1;
     }
-        
-        printf("| Process %d will request for more resources  |\n", processesIDs[more_resources - 1]);
-        return 1;
+    printf("Process %d will request more memory", more_resources);        
+    return 1;
        
 }
 
 void printProcesses() {
     printf("\nProcesses:\n");
     for (int i = 0; i < num_processes; i++) {
-        printf("Process %d (ID: %d) - Pages: %d\n", i + 1, processesIDs[i], allProcesses[i].numPages);
+        printf("Process %d (ID: %d) | Pages: %d | Memory: %d\n", i + 1, processesIDs[i], allProcesses[i].numPages, memoryReq[i]);
     }
 }
 
 // manual GUI
 void manualSystem(){
 
-    int NUM_PROCESSES;
     printf("Enter number of processes you want to run: ");
-    scanf("%d", &NUM_PROCESSES);
+    scanf("%d", &num_processes);
 
-    if (NUM_PROCESSES > MAX_PROCESSES) {
+    if (num_processes > MAX_PROCESSES) {
         printf("%sExceeded maximum number of processes. Exiting...%s\n", RED, RESET);
         return;
     }
 
-    num_processes = NUM_PROCESSES;
  
     createProcesses();
     enterNumPages();
@@ -115,7 +121,7 @@ void manualSystem(){
 void automatedSystem(){
     int NUM_PROCESSES = 5; 
     int NUM_PAGES[5] = {1,2,3,4,5};   
-    int more_resources = 1; 
+    int more_resources = 0; 
 
     num_processes = NUM_PROCESSES;
 

@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define OUTER_TABLE_SIZE 16
-#define INNER_TABLE_SIZE 16
+#define OUTER_TABLE_SIZE 4
+#define INNER_TABLE_SIZE 4
 
 typedef struct {
     int pid;

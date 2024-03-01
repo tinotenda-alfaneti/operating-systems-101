@@ -4,8 +4,8 @@
 #include "header/frame.h"
 #include "header/colors.h"
 
-#define OUTER_TABLE_SIZE 16
-#define INNER_TABLE_SIZE 16
+#define OUTER_TABLE_SIZE 4
+#define INNER_TABLE_SIZE 4
 
 Process *createProcess(int pID, int numPages)
 {
@@ -18,27 +18,8 @@ Process *createProcess(int pID, int numPages)
 	return p;
 }
 
-int requestMoreMemory(Process *process, int additionalPages) {
-    printf("\nProcess %d is requesting more resources...", process->pID);
-    if (process->numPages + additionalPages > MAX_REQUESTS) {
-        printf("\n%sMemory request denied. Maximum number of requests reached.%s\n", RED, RESET);
-        return -1;
-    } else {
-        printf("\n%sMemory request for %d additional pages granted.%s\n", GREEN, additionalPages, RESET);
-        // Allocate memory and update process details accordingly
-        process->requestedPages = realloc(process->requestedPages, (process->numPages + additionalPages) * sizeof(uint32_t));
-        uint32_t *additionalPagesArray = getRandomPages(additionalPages);
-        for (int i = 0; i < additionalPages; i++) {
-            process->requestedPages[process->numPages + i] = additionalPagesArray[i];
-        }
-        process->numPages += additionalPages;
-        printf("\npage table after being granted more resources\n");
-        printProcessTable(process);
-        return 1;
-    }
-}
-
 void printProcessTable(Process *process) {
+    printf("\n\t\tPAGE TABLE\n");
     printf(YELLOW);
     printf("+-------------+-------------+-------------+-------------+-----+-------+\n");
     printf("| Page Number | Frame Num   | Outer Index | Offset      | PID | Valid |\n");

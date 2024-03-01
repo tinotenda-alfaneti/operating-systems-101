@@ -2,30 +2,21 @@
 #include "header/addressing.h"
 #include "header/colors.h"
 
-void shuffle(Request *items, int num_items)
-{
-    if (num_items > 1) {
-        srand(time(NULL));
-        for (int i = 0; i < num_items; i++){
-          int j = rand() % (num_items);
-          Request tmp =items[j];
-          items[j] = items[i];
-          items[i] = tmp;
-        }
-    }
-}
+#define MORE_MEM (rand() % (PAGE_SIZE * 3))
 
-void printRequestQueue(Request *list_of_requests, int total_requests) {
-    printf("\nRequest Queue:\n");
-    printf("+-----------------+------------+\n");
-    printf("| REQUEST ADDRESS | PROCESS ID |\n");
-    printf("+-----------------+------------+\n");
+void printRequestQueue(Process process) {
+    printf("\n\t\tREQUEST QUEUE\n");
+    printf(YELLOW);
+    printf("+-----------------+-----------+\n");
+    printf("| REQUEST ADDRESS |PROCESS ID |\n");
+    printf("+-----------------+-----------+\n");
+    printf(RESET);
 
-    for(int r = 0; r < total_requests; r++) {
-        printf("|   0x%04X        |     %3d    |\n", list_of_requests[r].address, list_of_requests[r].process_id);
+    for(int r = 0; r < process.numPages; r++) {
+        printf("|   0x%03X        |     %3d    |\n", process.requestedPages[r], process.pID);
     }
 
-    printf("+-----------------+------------+\n");
+    printf("+-----------------+-----------+\n");
 }
 
 void printMemory(Frame *memory) {
@@ -37,7 +28,7 @@ void printMemory(Frame *memory) {
     printf("+-------+---------+--------+--------+\n");
     printf(RESET);
     
-    for (int i = 0; i < MEMORY_SIZE; i++) {
+    for (int i = 0; i < NUM_FRAMES; i++) {
         if (memory[i].valid == 0) {
             printf("|%7d|   %sEmpty%s                   |\n", i, RED, RESET);
         } else {
@@ -46,67 +37,93 @@ void printMemory(Frame *memory) {
         printf("+-------+---------+--------+--------+\n");
     }
 }
-void addProcessPagesToMemory(Request *request, Frame *memory, Process *processes) {
+
+int requestMoreMemory(Process *process, int additionalMemory, Frame *memory) {
+    printf("\nProcess %d is requesting %s%d%s...", process->pID, BLUE, additionalMemory, RESET);
+
+    int additionalPages = additionalMemory / PAGE_SIZE;
+    if ((additionalMemory % PAGE_SIZE) != 0) additionalPages += 1;
+
+    int freeFrames = countFreeFrames(memory);
+
+    if (process->numPages + additionalPages > freeFrames) {
+        printf("\n%sMemory request denied. Maximum number of requests reached.%s\n", RED, RESET);
+        addProcessPagesToMemory(process, memory, 2);
+        return -1;
+    } else {
+        printf("\n%sMemory request for %d additional pages granted.%s\n", GREEN, additionalPages, RESET);
+        // Allocate memory and update process details accordingly
+        process->requestedPages = realloc(process->requestedPages, (process->numPages + additionalPages) * sizeof(uint32_t));
+        uint32_t *additionalPagesArray = getRandomPages(additionalPages);
+
+        for (int i = 0; i < additionalPages; i++) {
+            process->requestedPages[process->numPages + i] = additionalPagesArray[i];
+        }
+
+        process->numPages += additionalPages;
+
+        printf("\npage table after being granted more resources\n");
+        printProcessTable(process);
+        addProcessPagesToMemory(process, memory, -1);
+        return 1;
+    }
+}
+
+
+void addProcessPagesToMemory(Process *process, Frame *memory, int needMemory) {
 
 	uint32_t indicesArr[3];
-	getIndices(request->address, indicesArr);
 
-	int outerIdx = (int)indicesArr[0];
-	int pageNum = (int)indicesArr[1];
-	int offset = (int)indicesArr[2];
+    if (needMemory == 1) {
+        requestMoreMemory(process, MORE_MEM, memory);
+        return;
+    } else if (needMemory == 2) {
+        return;
+    }
 
-	PageEntry *entry = &(processes[request->process_id % 100].table->innerPageTables[outerIdx].entries[pageNum]);
-	entry->outerIndex = outerIdx;
-	entry->offset = offset;
+    for (int i = 0; i < process->numPages; i++) {
 
-	insertFrame(entry, memory, processes);
+        getIndices(process->requestedPages[i], indicesArr);
+
+        int outerIdx = (int)indicesArr[0];
+        int pageNum = (int)indicesArr[1];
+        int offset = (int)indicesArr[2];
+
+        PageEntry *entry = &(process->table->innerPageTables[outerIdx].entries[pageNum]);
+        entry->outerIndex = outerIdx;
+        entry->offset = offset;
         
+        insertFrame(entry, memory, process);
+
+    }
 
 }
 
 
-void simulateProcessesRun(Process processes[], int NUMBER_OF_PROCESSES, int reqProcess){
-    
-    int sum = 0;
-
-    for (int i = 0; i < NUMBER_OF_PROCESSES; i++) {
-        sum += processes[i].numPages;
-    }
-    int total_requests = sum;
-
-    Request *list_of_requests = (Request*)malloc(sum * sizeof(Request));
-
-     for(int i = 0; i < NUMBER_OF_PROCESSES; i ++){
-        for(int j=0; j < processes[i].numPages; j++){
-            sum--; 
-            if(sum < 0){
-                break;
-            }
-            Request* new_request = (Request*)malloc(sizeof(Request));
-            new_request->address = processes[i].requestedPages[j];
-            new_request->process_id = processes[i].pID;
-            list_of_requests[sum] = *new_request;            
-        }
-        if(sum == 0){
-                break;
-            }
-    }
-
-    shuffle(list_of_requests, total_requests);
-    printRequestQueue(list_of_requests, total_requests);
+void simulateProcessesRun(Process *processes, int NUMBER_OF_PROCESSES, int reqProcess){
 
     //initialize memory
-	Frame *memory = createFrame(8);
+	Frame *memory = createFrame();
     printMemory(memory);
 
-    for(int i = 0; i < total_requests; i++){
-        int index = list_of_requests[i].process_id % 100;
-        printf("\n\n%sREQUEST %d to address 0x%04X from %d%s\n", BLUE, i + 1, list_of_requests[i].address, list_of_requests[i].process_id, RESET);
-        addProcessPagesToMemory(&list_of_requests[i], memory, processes);
-        printProcessTable(&processes[index]);   
+    for(int i = 0; i < NUMBER_OF_PROCESSES; i++){
+        printf("\n\n%sCURRENT PROCCESS RUNNING: PID=%d %s\n", BLUE, processes[i].pID, RESET);
+        printRequestQueue(processes[i]);
+        if (i == reqProcess) {
+            addProcessPagesToMemory(&processes[i], memory, 1);
+        } else {
+            addProcessPagesToMemory(&processes[i], memory, -1);
+        }
+        
+        printProcessTable(&processes[i]);
+        printMemory(memory);
+
+        //Memory deallocation
+        releaseFrame(memory);
+        memory = createFrame();   
     }
     
-    requestMoreMemory(&processes[reqProcess], 3);
+    // requestMoreMemory(&processes[reqProcess], 3, memory);
     
 
     printMemory(memory);

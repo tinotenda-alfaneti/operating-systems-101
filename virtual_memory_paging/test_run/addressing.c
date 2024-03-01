@@ -1,9 +1,9 @@
 #include "header/addressing.h"
 
 // Define the bit masks for extracting level indices and offset
-uint32_t outerMask = 0xF000;  
-uint32_t innerMask = 0x0F00;  
-uint32_t offsetMask = 0x00FF;  // mask for offset
+uint32_t outerMask = 0xF00;  
+uint32_t innerMask = 0x0F0;  
+uint32_t offsetMask = 0x00F;  // mask for offset
 
 // Function to extract level indices and offset from a 32-bit hexadecimal address
 void getIndices(uint32_t address, uint32_t *indicesArr) {
@@ -15,7 +15,7 @@ void getIndices(uint32_t address, uint32_t *indicesArr) {
 }
 
 // Function to generate a random 32-bit hexadecimal address
-unsigned int generateRandomAddress(int i) {
+unsigned int generateRandomAddress() {
     
     // Seed the random number generator
     struct timespec current_time;
@@ -26,9 +26,14 @@ unsigned int generateRandomAddress(int i) {
 
     // Generate a random hexadecimal address
     unsigned int address = 0;
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 3; ++i) {
         address <<= 4; // Shift left by 4 bits
-        address |= rand() % 16; // Generate a random nibble (4-bit hexadecimal digit)
+        if (i == 2) {
+            address |= rand() % 16;   
+        } else {
+            address |= rand() % 4; // Generate a random nibble (3-bit hexadecimal digit)
+        }
+        
     }
 
     return address;
@@ -38,8 +43,7 @@ uint32_t* getRandomPages(int numPages) {
     uint32_t* requestedPages = (uint32_t*)malloc(numPages*sizeof(uint32_t));
 
     for (int i = 0; i < numPages; i++) {
-        requestedPages[i] = generateRandomAddress(i);
-        // sleep(1);
+        requestedPages[i] = generateRandomAddress();
     }
     return requestedPages;
 }

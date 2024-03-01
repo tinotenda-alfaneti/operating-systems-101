@@ -8,14 +8,10 @@
 #include <time.h> 
 #include "frame.h"
 
-typedef struct {
-    int address;
-    int process_id;  
-} Request;
-
 void simulateProcessesRun( Process processes[], int NUMBER_OF_PROCESSES, int reqProcess);
-void shuffle(Request *items, int num_items);
 void printMemory(Frame *memory);
-void addProcessPagesToMemory(Request *request, Frame *memory, Process *processes);
+void addProcessPagesToMemory(Process *process, Frame *memory, int needMemory);
+int countFreeFrames(Frame *memory);
+int requestMoreMemory(Process *process, int additionalMemory, Frame *memory);
 
 #endif /* SIMULATION_H */
