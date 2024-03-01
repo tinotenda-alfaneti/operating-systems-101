@@ -55,7 +55,7 @@ void insertFrame(PageEntry *entry, Frame *memory, Process *process) {
         memory[j].outerIndex = entry->outerIndex;
         entry->frameNumber = j;
         printf(GREEN);
-        printf("Frame successfully allocated into memory for PID: %d\n", memory[j].pid);
+        printf("Page successfully allocated into memory in frame: %d\n", memory[j].frameNumber);
         hits++;
         printf(RESET);
         
@@ -97,12 +97,7 @@ void printStatistics() {
     printf("+-----------------------+----------------+\n");
 }
 
-<<<<<<< HEAD
 void removeFromFrame(Frame remove, Process *process) {
-=======
-
-void removeFromFrame(Frame remove, Process *processes) {
->>>>>>> 9067d3069b38f91df6c2f1646d0c5622e107e684
 
     PageEntry *entry = &(process->table->innerPageTables[remove.outerIndex].entries[remove.pageNumber]);
     entry->frameNumber = -1;

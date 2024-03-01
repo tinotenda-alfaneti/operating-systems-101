@@ -22,8 +22,7 @@ unsigned int generateRandomAddress() {
     clock_gettime(CLOCK_REALTIME, &current_time);
     long long current_time_nsec = current_time.tv_sec * 1000000000LL + current_time.tv_nsec;
     
-    // srand(current_time_nsec);
-    srand(100);
+    srand(current_time_nsec);
 
     // Generate a random hexadecimal address
     unsigned int address = 0;

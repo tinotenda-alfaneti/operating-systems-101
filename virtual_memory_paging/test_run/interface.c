@@ -66,7 +66,6 @@ void automatedPages(int *numPages) {
 }
 
 void moreResources(){
-    int more_resources;
     printf("Which process is likely to request for more resources: ");
     scanf("%d", &more_resources);
     moreMemoryRequest(more_resources);

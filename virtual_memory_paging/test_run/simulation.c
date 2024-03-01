@@ -109,7 +109,7 @@ void simulateProcessesRun(Process *processes, int NUMBER_OF_PROCESSES, int reqPr
     for(int i = 0; i < NUMBER_OF_PROCESSES; i++){
         printf("\n\n%sCURRENT PROCCESS RUNNING: PID=%d %s\n", BLUE, processes[i].pID, RESET);
         printRequestQueue(processes[i]);
-        if (i == reqProcess) {
+        if (i == reqProcess - 1) {
             addProcessPagesToMemory(&processes[i], memory, 1);
         } else {
             addProcessPagesToMemory(&processes[i], memory, -1);
@@ -123,10 +123,7 @@ void simulateProcessesRun(Process *processes, int NUMBER_OF_PROCESSES, int reqPr
         memory = createFrame();   
     }
     
-    // requestMoreMemory(&processes[reqProcess], 3, memory);
-    
-
-    printMemory(memory);
+    printf("\n\nDONE SIMULATION\n\n");
 
     printStatistics();
  
